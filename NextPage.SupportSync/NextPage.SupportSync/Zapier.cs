@@ -8,6 +8,8 @@ using Bogus;
 using Newtonsoft.Json;
 using System.Reflection;
 using Newtonsoft.Json.Converters;
+using System.Web.Script.Serialization;
+using Nelibur.ObjectMapper;
 
 namespace NextPage.SupportSync
 {
@@ -43,16 +45,20 @@ namespace NextPage.SupportSync
             public List<CustomerField> CustomerFieldList { get; set; }
         }
 
-
-        public Customer GetCustomer()
+        public dynamic AddEditCustomers()
         {
-            var cust = Customers[0];
+            return null;
+        }
+
+        public Customer GetCustomer(int customerId)
+        {
+            var cust = Customers.First(x => x.CustomerId == customerId);
             return cust;
         }
 
-        public ExpandoObject GetCustomersFlatJson()
+        public ExpandoObject GetCustomersFlatJson(int customerId)
         {
-            var cust = Customers[0];
+            var cust = GetCustomer(customerId);
             var expConverter = new ExpandoObjectConverter();
             ExpandoObject mycust = JsonConvert.DeserializeObject<ExpandoObject>(JsonConvert.SerializeObject(cust), expConverter);
 
@@ -83,7 +89,7 @@ namespace NextPage.SupportSync
             expandoDict.Remove(propertyName);
         }
 
-        List<Customer> Customers = new List<Customer>();
+        public List<Customer> Customers = new List<Customer>();
 
         public void LoadCustomers()
         {
@@ -99,7 +105,7 @@ namespace NextPage.SupportSync
                         .RuleFor(u => u.CustomerPhone, f => f.Phone.PhoneNumber())
                         .RuleFor(u => u.CustomerPhoneExt, f => f.Random.Number(1000, 2000).ToString())
                         .RuleFor(u => u.CustomerEmail, f => f.Internet.Email())
-                        .RuleFor(u => u.CustomerId, f => f.Random.Number(100, 1000))
+                        .RuleFor(u => u.CustomerId, f => f.UniqueIndex)
                         .RuleFor(u => u.CustomerAddressCheckOff, f => f.Random.Bool());
             Customers = testCustomers.Generate(10).ToList();
 
@@ -117,6 +123,22 @@ namespace NextPage.SupportSync
                     cust.CustomerFieldList.Add(field);
                 }
             }
+        }
+
+        public Customer AddEditCustomer(Customer customer)
+        {
+            TinyMapper.Bind<Customer, Customer>();
+
+            var cust = Customers.FirstOrDefault(x => x.CustomerId == customer.CustomerId);
+            cust = TinyMapper.Map<Customer>(customer);
+            Customers[cust.CustomerId] = cust;
+            return cust;
+            //var exists = Customers.Exists(x => x.CustomerId == customer.CustomerId);
+            //if (exists)
+            //{
+            //    var cust = Customers.First(x => x.CustomerId == customer.CustomerId);
+            //    cust
+            //}
         }
     }
 }

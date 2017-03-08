@@ -16,10 +16,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>10/20/2016 12:27:01</publishTime>
     </File>
     <File Include="bin/NextPage.SupportSync.dll">
-      <publishTime>03/03/2017 18:00:39</publishTime>
+      <publishTime>03/07/2017 15:33:44</publishTime>
     </File>
     <File Include="bin/SupportSync.dll">
-      <publishTime>03/03/2017 18:01:16</publishTime>
+      <publishTime>03/07/2017 15:33:45</publishTime>
     </File>
     <File Include="bin/System.Net.Http.Formatting.dll">
       <publishTime>03/03/2017 17:20:49</publishTime>
@@ -48,6 +48,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="bin/System.Web.Webpages.Razor.dll">
       <publishTime>03/03/2017 15:04:54</publishTime>
     </File>
+    <File Include="bin/TinyMapper.dll">
+      <publishTime>03/07/2017 15:09:51</publishTime>
+    </File>
     <File Include="Global.asax">
       <publishTime>03/03/2017 15:04:53</publishTime>
     </File>
@@ -61,7 +64,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>03/03/2017 15:04:53</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>03/03/2017 18:00:40</publishTime>
+      <publishTime>03/07/2017 15:33:45</publishTime>
     </File>
   </ItemGroup>
 </Project>
