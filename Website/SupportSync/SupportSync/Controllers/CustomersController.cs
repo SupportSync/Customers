@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NextPage.SupportSync;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -36,21 +38,61 @@ namespace SupportSync.Controllers
             }
         }
 
-        public string CustomersFlatJson()
+        [HttpPost]
+        public NextPage.SupportSync.Zapier.Customer AddEditCustomer()
         {
-            var obj = MvcApplication.zap.GetCustomersFlatJson();
+            Request.InputStream.Seek(0, SeekOrigin.Begin);
+            string jsonObj = new StreamReader(Request.InputStream).ReadToEnd();
+
+            var customer = JsonConvert.DeserializeObject<NextPage.SupportSync.Zapier.Customer>(jsonObj.ToString());
+            Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonObj.ToString());
+
+            var fields = new List<NextPage.SupportSync.Zapier.CustomerField>();
+            foreach (var val in values)
+            {
+                if (!PropertyUtils.Exists(val.Key, customer))
+                {
+                    fields.Add(new NextPage.SupportSync.Zapier.CustomerField { CustomerId = customer.CustomerId, FieldName = val.Key, FieldValue = val.Value });
+                }
+            }
+            customer.CustomerFieldList = fields;
+            MvcApplication.zap.AddEditCustomer(customer);
+            return customer;
+        }
+
+        public string GetCustomer(int customerId)
+        {
+            var obj = MvcApplication.zap.GetCustomersFlatJson(customerId);
 
             var serializer = new JavaScriptSerializer();
             serializer.RegisterConverters(new JavaScriptConverter[] { new ExpandoJSONConverter() });
             var json = serializer.Serialize(obj);
 
+            Response.ContentType = "application/json";
             return json;
         }
 
-        public JsonResult Customer()
+        public JsonResult GetCustomers()
         {
-            var result = MvcApplication.zap.GetCustomer();
-            return Json(result, JsonRequestBehavior.AllowGet);
+            return Json(MvcApplication.zap.Customers, JsonRequestBehavior.AllowGet);
         }
+
+        //public string CustomersFlatJson()
+        //{
+        //    var obj = MvcApplication.zap.GetCustomersFlatJson();
+
+        //    var serializer = new JavaScriptSerializer();
+        //    serializer.RegisterConverters(new JavaScriptConverter[] { new ExpandoJSONConverter() });
+        //    var json = serializer.Serialize(obj);
+
+
+        //    return json;
+        //}
+
+        //public JsonResult Customer()
+        //{
+        //    var result = MvcApplication.zap.GetCustomer();
+        //    return Json(result, JsonRequestBehavior.AllowGet);
+        //}
     }
 }
